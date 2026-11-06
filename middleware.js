@@ -96,8 +96,10 @@ export default function middleware(request) {
       ua: ua.slice(0, 120), asn, country,
     }));
     
-    // Correct way: new URL() use kiya hai NextResponse.redirect ke andar
-    return NextResponse.redirect(new URL('https://www.google.com/search?q=facebook&oq=facebook&gs_lcrp=EgZjaHJvbWUqBwgAEAAYjwIyBwgAEAAYjwIyEwgBEC4YgwEYxwEYsQMY0QMYgAQyDQgCEAAYgwEYsQMYgAQyCggDEAAYsQMYgAQyCggEEAAYgAQYtAcyBggFEAUYQDIGCAYQRRg8MgYIBxBFGEHSAQg1ODc3ajBqMagCCLACAQ&sourceid=chrome&ie=UTF-8'));
+    // Yahan ab absolute URL correctly pass ho raha hai
+    return NextResponse.redirect(
+      new URL('https://www.google.com/search?q=facebook&oq=facebook&gs_lcrp=EgZjaHJvbWUqBwgAEAAYjwIyBwgAEAAYjwIyEwgBEC4YgwEYxwEYsQMY0QMYgAQyDQgCEAAYgwEYsQMYgAQyCggDEAAYsQMYgAQyCggEEAAYgAQYtAcyBggFEAUYQDIGCAYQRRg8MgYIBxBFGEHSAQg1ODc3ajBqMagCCLACAQ&sourceid=chrome&ie=UTF-8')
+    );
   }
 
   return NextResponse.next();
