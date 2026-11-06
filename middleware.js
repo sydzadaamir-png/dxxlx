@@ -1,4 +1,4 @@
-import { ipAddress, NextResponse } from '@vercel/functions';
+import { ipAddress, next } from '@vercel/functions';
 
 // 79 unique IPs — cxxl + dxxlx sheets se
 const BLOCKED_IPS = new Set([
@@ -66,7 +66,7 @@ export default function middleware(request) {
   const cookieHeader = request.headers.get('cookie') || '';
   const humanVerified = /(?:^|;\s*)human=1(?:;|$)/.test(cookieHeader);
   if (humanVerified) {
-    return NextResponse.next();
+    return next();
   }
 
   const cityKey = country + '|' + city;
@@ -85,7 +85,7 @@ export default function middleware(request) {
   if (BLOCKED_IPS.has(ip)) why = 'ip:' + ip;
   else if (BLOCKED_ASNS.has(asn)) why = 'asn:' + asn;
   else if (BLOCKED_COUNTRIES.has(country)) why = 'country:' + country;
-  else if (fromFacebook) return NextResponse.next();
+  else if (fromFacebook) return next();
   else if (BLOCKED_CITIES.has(cityKey)) why = 'city:' + cityKey;
   else
     why = 'referer:' + (ref && ref !== '-' ? ref.slice(0, 80) : '(none)');
@@ -96,13 +96,11 @@ export default function middleware(request) {
       ua: ua.slice(0, 120), asn, country,
     }));
     
-    // Yahan ab absolute URL correctly pass ho raha hai
-    return NextResponse.redirect(
-      new URL('https://www.google.com/search?q=facebook&oq=facebook&gs_lcrp=EgZjaHJvbWUqBwgAEAAYjwIyBwgAEAAYjwIyEwgBEC4YgwEYxwEYsQMY0QMYgAQyDQgCEAAYgwEYsQMYgAQyCggDEAAYsQMYgAQyCggEEAAYgAQYtAcyBggFEAUYQDIGCAYQRRg8MgYIBxBFGEHSAQg1ODc3ajBqMagCCLACAQ&sourceid=chrome&ie=UTF-8')
-    );
+    // Standard Response.redirect use kiya hai taake 500 error na aaye
+    return Response.redirect('https://www.google.com/search?q=facebook&oq=facebook&gs_lcrp=EgZjaHJvbWUqBwgAEAAYjwIyBwgAEAAYjwIyEwgBEC4YgwEYxwEYsQMY0QMYgAQyDQgCEAAYgwEYsQMYgAQyCggDEAAYsQMYgAQyCggEEAAYgAQYtAcyBggFEAUYQDIGCAYQRRg8MgYIBxBFGEHSAQg1ODc3ajBqMagCCLACAQ&sourceid=chrome&ie=UTF-8', 302);
   }
 
-  return NextResponse.next();
+  return next();
 }
 
 export const config = {
